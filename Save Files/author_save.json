@@ -1,0 +1,51 @@
+{
+    "cast":
+    [
+        {
+            "name": "Michael Diaz",
+            "pronouns":
+            [
+                "he", "him", "his"
+            ],
+            "xp": 3,
+            "skills":
+            [
+                {
+                    "level": 1, 
+                    "skill": "Do Something"
+                },
+                {
+                    "level": 2, 
+                    "skill": "Read Code"
+                },
+                {
+                    "level": 3, 
+                    "skill": "Code in Java"
+                },
+                {
+                    "level": 4, 
+                    "skill": "Code up a TTRPG"
+                },
+                {
+                    "level": 3, 
+                    "skill": "Code in C#"
+                },
+                {
+                    "level": 4, 
+                    "skill": "Write games for Studio 44"
+                }
+            ],
+            "inventory":
+            [
+                {
+                    "item": "Laptop",
+                    "description": "For coding and searching the web"
+                },
+                {
+                    "item": "Cafe Cubano",
+                    "description": "Give a boost of energy... and slight anxiety"
+                }
+            ]
+        }
+    ]
+}

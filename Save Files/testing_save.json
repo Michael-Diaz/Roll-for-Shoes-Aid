@@ -1,0 +1,56 @@
+{
+    "cast":
+    [
+        {
+            "name": "Jim Doe",
+            "pronouns":
+            [
+                "they", "them", "theirs"
+            ],
+            "xp": 0,
+            "skills":
+            [
+                {
+                    "level": 1, 
+                    "skill": "Do Something"
+                }
+            ],
+            "inventory":
+            []
+        },
+        {
+            "name": "Jane Doe",
+            "pronouns":
+            [
+                "she", "her", "hers"
+            ],
+            "xp": 0,
+            "skills":
+            [
+                {
+                    "level": 1, 
+                    "skill": "Do Something"
+                }
+            ],
+            "inventory":
+            []
+        },
+        {
+            "name": "John Doe",
+            "pronouns":
+            [
+                "he", "him", "his"
+            ],
+            "xp": 0,
+            "skills":
+            [
+                {
+                    "level": 1, 
+                    "skill": "Do Something"
+                }
+            ],
+            "inventory":
+            []
+        }
+    ]
+}
