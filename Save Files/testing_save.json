@@ -1,9 +1,9 @@
-{
-    "cast":
-    [
+[ 
+    {
+        "character":
         {
             "name": "Jim Doe",
-            "pronouns":
+            "pronouns": 
             [
                 "they", "them", "theirs"
             ],
@@ -17,7 +17,10 @@
             ],
             "inventory":
             []
-        },
+        }
+    },
+    {
+        "character":
         {
             "name": "Jane Doe",
             "pronouns":
@@ -34,7 +37,10 @@
             ],
             "inventory":
             []
-        },
+        }
+    },
+    {
+        "character":
         {
             "name": "John Doe",
             "pronouns":
@@ -52,5 +58,5 @@
             "inventory":
             []
         }
-    ]
-}
+    }
+]

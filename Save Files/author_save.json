@@ -1,11 +1,11 @@
-{
-    "cast":
-    [
+[
+    {
+        "character":
         {
             "name": "Michael Diaz",
             "pronouns":
             [
-                "he", "him", "his"
+                "he", "him", "his", "they", "them", "theirs"
             ],
             "xp": 3,
             "skills":
@@ -43,9 +43,9 @@
                 },
                 {
                     "item": "Cafe Cubano",
-                    "description": "Give a boost of energy... and slight anxiety"
+                    "description": "Gives a boost of energy... and slight anxiety"
                 }
             ]
         }
-    ]
-}
+    }
+]
