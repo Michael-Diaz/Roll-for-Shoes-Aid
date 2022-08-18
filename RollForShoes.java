@@ -8,11 +8,12 @@ import org.json.simple.parser.*;
 import java.io.*;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RollForShoes
 {
     static Scanner userInput;
-    static ArrayList<Character> cast;
+    static ArrayList<PlayerCharacter> cast;
 
     /* Runs the main program, displaying the initial flavortext,
      * assigning the scanner and cast array, and prompts a file
@@ -21,7 +22,7 @@ public class RollForShoes
     public static void main(String[] args)
     {
         userInput = new Scanner(System.in);
-        cast = new ArrayList<Character>();
+        cast = new ArrayList<PlayerCharacter>();
 
         System.out.println("==== Welcome to the 'Roll for Shoes' Aid! ==== \n\n" 
                             + "'Roll for Shoes' is an easy-to-setup TTRPG \n"
@@ -129,7 +130,10 @@ public class RollForShoes
             for (int i = 0; i < castList.size(); i++)
             {
                 JSONObject playerChar = (JSONObject)castList.get(i);
-                parseSaveFile(playerChar);
+                PlayerCharacter castMem = parseSaveFile(playerChar);
+                castMem.displayStats();
+
+                cast.add(castMem);
             }
         }
         catch (IOException e) 
@@ -146,50 +150,50 @@ public class RollForShoes
         // load the JSON file the user chose
         // extract the # of PCs in the file, for each one...
         // either extract the data into variables and run a constructor...
-        // or find a way to turn the structure into an object directly
         // add each 
     }
 
-    public static void parseSaveFile(JSONObject character)
+    public static PlayerCharacter parseSaveFile(JSONObject character)
     {
         //Get player character object within list
         JSONObject charObject = (JSONObject) character.get("character");
          
+        ArrayList<String> identifiers = new ArrayList<String>();
         String name = (String) charObject.get("name");    
-        System.out.println(name);
+        identifiers.add(name);
 
-        ArrayList<String> pronouns = new ArrayList<String>();
-        JSONArray jPronouns = (JSONArray) charObject.get("pronouns");
-        for (Object jPnoun : jPronouns) 
-        {
-            System.out.println(jPnoun.toString());
-            pronouns.add(jPnoun.toString());
-        }
+        JSONArray pronouns = (JSONArray) charObject.get("pronouns");
+        for (Object pronoun : pronouns)
+            identifiers.add(pronoun.toString());
 
-        String skill;
-        long skillLvl;
         JSONArray skills = (JSONArray) charObject.get("skills");
         for (Object ability : skills)
         {
             JSONObject jAbility = (JSONObject) ability;
-            skill = (String) jAbility.get("skill");
-            skillLvl = (long) jAbility.get("level");
+
+            String skill = (String) jAbility.get("skill");
+            long skillLvl = (long) jAbility.get("level");
+
             System.out.println(skill + ", lvl: " + skillLvl);
         }
         
-        long xp = (long) charObject.get("xp");    
-        System.out.println(xp);
+        long xp = (long) charObject.get("xp");
 
-        String itemName;
-        String itemDesc;
-        JSONArray inventory = (JSONArray) charObject.get("inventory");
-        for (Object item : inventory)
+        HashMap<String, Long> inventory = new HashMap<String, Long>();
+        JSONArray jInventory = (JSONArray) charObject.get("inventory");
+        for (Object item : jInventory)
         {
             JSONObject jItem = (JSONObject) item;
-            itemName = (String) jItem.get("item");
-            itemDesc = (String) jItem.get("description");
-            System.out.println(itemName + ": \t" + itemDesc);
+
+            String itemName = (String) jItem.get("item");
+            String itemDesc = (String) jItem.get("description");
+            long itemCount = (long) jItem.get("amount");
+
+            inventory.put(itemName + "~" + itemDesc, itemCount);
         }
+
+        PlayerCharacter retVal = new PlayerCharacter(identifiers, xp, inventory);
+        return retVal;
     }
 
     public static void buildCast()
@@ -245,5 +249,8 @@ public class RollForShoes
 
 
     // ========== GAMEPLAY ==========
-
+    public static void runSession(ArrayList<PlayerCharacter> cast, String path)
+    {
+        
+    }
 }

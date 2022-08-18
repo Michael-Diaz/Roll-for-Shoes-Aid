@@ -12,38 +12,47 @@
             [
                 {
                     "level": 1, 
-                    "skill": "Do Something"
+                    "skill": "Do Something",
+                    "previous": "N/a"
                 },
                 {
                     "level": 2, 
-                    "skill": "Read Code"
+                    "skill": "Read Code",
+                    "previous": "Do Something"
+
                 },
                 {
                     "level": 3, 
-                    "skill": "Code in Java"
+                    "skill": "Code in Java",
+                    "previous": "Read Code"
                 },
                 {
                     "level": 4, 
-                    "skill": "Code up a TTRPG"
+                    "skill": "Code up a TTRPG",
+                    "previous": "Code in Java"
                 },
                 {
                     "level": 3, 
-                    "skill": "Code in C#"
+                    "skill": "Code in C#",
+                    "previous": "Read Code"
                 },
                 {
                     "level": 4, 
-                    "skill": "Write games for Studio 44"
+                    "skill": "Write games for Studio 44",
+                    "previous": "Code in C#"
                 }
             ],
             "inventory":
             [
                 {
                     "item": "Laptop",
-                    "description": "For coding and searching the web"
+                    "description": "For coding and searching the web",
+                    "amount": 1
                 },
                 {
                     "item": "Cafe Cubano",
-                    "description": "Gives a boost of energy... and slight anxiety"
+                    "description": "Gives a boost of energy... and slight anxiety",
+                    "amount": 3
                 }
             ]
         }
