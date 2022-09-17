@@ -53,4 +53,30 @@ public class Skill
     {
         return stems;
     }
+
+    public Skill searchSkills(String skillName)
+    {
+        Skill retSkill = null;
+        
+        if (this.name.toLowerCase().equals(skillName.toLowerCase()))
+            retSkill = this;
+        else
+        {
+            for (Skill s : stems)
+                retSkill = s.searchSkills(skillName);
+        }
+
+        return retSkill;
+    }
+
+    public void printTree()
+    {
+        for (int i = 0; i < lvl - 1; i++)
+            System.out.print(" ");
+        
+        System.out.println("> " + lvl + ": " + name);
+
+        for (Skill s : stems)
+            s.printTree();
+    }
 }

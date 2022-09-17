@@ -1,18 +1,17 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class PlayerCharacter
 {
     private String charName;
-    private ArrayList<String> charPronouns;
+    public ArrayList<String> charPronouns;
 
     private long charXp;
-    //? private Skill skillTreeRoot; will eventually implement
+    private Skill skillTreeRoot;
 
     private HashMap<String, Long> charInv;
 
-    PlayerCharacter(ArrayList<String> ids, long xp, HashMap<String, Long> inv)
+    PlayerCharacter(ArrayList<String> ids, long xp, Skill root, HashMap<String, Long> inv)
     {
         charName = ids.get(0);
         ids.remove(0);
@@ -20,18 +19,21 @@ public class PlayerCharacter
         charPronouns = ids;
 
         charXp = xp;
+        skillTreeRoot = root;
 
         charInv = inv;
     }
 
     public void displayStats()
     {
-        String header = "===== " + charName + " " + charPronouns.toString() + " =====\n";
+        String header = "===== " + charName + " " + charPronouns.toString().toUpperCase() + " =====\n";
         System.out.println(header);
 
-        System.out.println("Remaining XP: " + charXp);
+        System.out.println("Available XP: " + charXp);
+        System.out.println("Skills: \n-------");
+        skillTreeRoot.printTree();
 
-        System.out.println("Inventory: ");
+        System.out.println("\nInventory: ");
         if (charInv.isEmpty())
             System.out.println("  -Empty!");
         else
@@ -46,7 +48,7 @@ public class PlayerCharacter
         }
 
         System.out.print("\n");
-        for (int i = 0; i < header.length(); i++)
+        for (int i = 0; i < header.length() - 1; i++)
             System.out.print("=");
         System.out.println("\n");
     }

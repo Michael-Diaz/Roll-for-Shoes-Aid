@@ -7,6 +7,7 @@ import org.json.simple.parser.*;
 
 import java.io.*;
 import java.util.Scanner;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -45,7 +46,7 @@ public class RollForShoes
     public static void promptFile()
     {
         String[] pathnames;
-        String root = "C:/Users/HP/Documents/Github/Roll-for-Shoes-Aid/Save Files/";
+        String root = System.getProperty("user.dir") + "/Save Files/";
         File f = new File(root);
 
         FilenameFilter filter = new FilenameFilter() 
@@ -63,7 +64,7 @@ public class RollForShoes
         {
             System.out.println("Loading Saves... \n"
                                 + "No saves found, creating a new save slot...");
-            buildCast();
+            buildCast(pathnames);
         }
         else
         {
@@ -74,8 +75,8 @@ public class RollForShoes
             {
                 try
                 {
-                    System.out.println("\nSave(s) found, select a file [#] or '0' to create a new save: \n"
-                                        + "-------------------------------------------------------------");
+                    System.out.println("\nSave(s) found, select a file [#] or enter '0' to create a new save: \n"
+                                        + "-------------------------------------------------------------------");
 
                     int fileNum = 1;
                     for (String pathname : pathnames) 
@@ -94,8 +95,8 @@ public class RollForShoes
                     {
                         if (fileChoice == 0)
                         {
-                            System.out.println("\nCreating a new save slot...");
-                            buildCast();
+                            System.out.print("\nInitializing a new save slot...");
+                            buildCast(pathnames);
                             break;
                         }
                         else
@@ -118,7 +119,7 @@ public class RollForShoes
 
     public static void loadCast(String path)
     {
-        System.out.println(path);
+        System.out.println(path + "\n");
         JSONParser jsonParser = new JSONParser();
          
         try (FileReader reader = new FileReader(path))
@@ -131,8 +132,8 @@ public class RollForShoes
             {
                 JSONObject playerChar = (JSONObject)castList.get(i);
                 PlayerCharacter castMem = parseSaveFile(playerChar);
+                
                 castMem.displayStats();
-
                 cast.add(castMem);
             }
         }
@@ -146,11 +147,13 @@ public class RollForShoes
             System.out.println("\n!!! {ERROR READING FILE} !!!");
             e.printStackTrace();
         }
+        catch (Exception e)
+        {
+            System.out.println("\n!!! {ERROR READING FILE} !!!");
+            e.printStackTrace();
+        }
 
-        // load the JSON file the user chose
-        // extract the # of PCs in the file, for each one...
-        // either extract the data into variables and run a constructor...
-        // add each 
+        runSession(cast, path);
     }
 
     public static PlayerCharacter parseSaveFile(JSONObject character)
@@ -166,15 +169,27 @@ public class RollForShoes
         for (Object pronoun : pronouns)
             identifiers.add(pronoun.toString());
 
+        Skill treeRoot = new Skill();
+        boolean first = true;
         JSONArray skills = (JSONArray) charObject.get("skills");
         for (Object ability : skills)
         {
             JSONObject jAbility = (JSONObject) ability;
 
             String skill = (String) jAbility.get("skill");
-            long skillLvl = (long) jAbility.get("level");
+            String prevSkill = (String) jAbility.get("previous");
 
-            System.out.println(skill + ", lvl: " + skillLvl);
+            if (first)
+                first = false;
+            else
+            {
+                Skill tempHold = treeRoot.searchSkills(prevSkill);
+                if (tempHold == null)
+                    treeRoot.stemSkill(skill);
+                else
+                    tempHold.stemSkill(skill);
+                    // CHECK FOR REDUNDANCY
+            }
         }
         
         long xp = (long) charObject.get("xp");
@@ -192,17 +207,64 @@ public class RollForShoes
             inventory.put(itemName + "~" + itemDesc, itemCount);
         }
 
-        PlayerCharacter retVal = new PlayerCharacter(identifiers, xp, inventory);
+        PlayerCharacter retVal = new PlayerCharacter(identifiers, xp, treeRoot, inventory);
         return retVal;
     }
 
-    public static void buildCast()
+    public static void buildCast(String[] existingSaves)
     {
-        // ask for number of characters, for each character...
-        // ask for name & pronouns
-        // initialize xp to 0, empty inventory, single skill: Do Something (1) then...
-        // display cast list, allow editing before confirming
-        // add characters to players[] array
+        int castSize;
+        String memField = "";
+        ArrayList<String> memID = new ArrayList<String>();
+
+        castSize = Integer.valueOf(validateCycle("\nHow many members will be in the cast [#]:", Integer.class, 1));
+
+        for (int i = 0; i < castSize; i++)
+        {
+            memID.clear();
+
+            memField = validateCycle("\nWhat is character " + (i + 1) + "'s name [__]:", String.class, Integer.MIN_VALUE);
+            memID.add(memField);
+
+            memField = validateCycle("\nWhat are " + memField + "'s pronouns [__,...,__]:", String.class, Integer.MIN_VALUE);
+            memID.addAll(Arrays.asList(memField.replaceAll("\\s", "").split(",")));
+
+            PlayerCharacter memTemp = new PlayerCharacter(new ArrayList<String>(memID), 0, new Skill(), new HashMap<String, Long>());
+            cast.add(memTemp);
+        }
+
+        System.out.println("\nSession Cast:\n-------------\n");
+        for (PlayerCharacter mem : cast)
+            mem.displayStats();
+
+        boolean repeatSave = true;
+        String savePath = "";
+        do
+        {
+            savePath = validateCycle("Name your save file [A-z]: ", String.class, Integer.MIN_VALUE) + "_save.json";
+            for (String path : existingSaves)
+            {
+                if (savePath.equals(path))
+                {
+                    System.out.println("\n!!! {FILENAME ALREADY EXISTS} !!!\n");
+                    repeatSave = true;
+                    break;
+                }
+                else
+                    repeatSave = false;
+            }
+
+            if (!savePath.substring(0, savePath.length() - 10).matches("^[a-zA-Z]*$"))
+            {
+                System.out.println("\n!!! {INPUT CONTAINS NON-ALPHABETIC ELEMENTS} !!!\n");
+                repeatSave = true;
+            }
+        }
+        while (repeatSave);
+
+        System.out.println("\nFinalizing new save..." + 
+                            "\n" + System.getProperty("user.dir") + "/Save Files/" + savePath + "\n");
+        runSession(cast, savePath);
     }
 
     
@@ -247,10 +309,75 @@ public class RollForShoes
         }
     }
 
+    public static String validateCycle(String question, Class<?> typeExpect, int limitRange)
+    {   
+        int intInput;
+        String strInput;
+        String strInputFinal = "";
+        
+        do
+        {
+            try
+            {
+                System.out.println(question);
+                for (int i = 0; i < question.length() - 1; i++)
+                    System.out.print("-");
+                System.out.print("\n>_: ");
+
+                userInput.nextLine();
+
+                if (typeExpect == Integer.class)
+                {
+                    intInput = userInput.nextInt();
+                    if (intInput < limitRange)
+                    {
+                        System.out.println("\n!!! {INPUT OUT OF RANGE} !!!");
+                        continue;
+                    }
+
+                    strInputFinal = String.valueOf(intInput);
+                }
+                else if (typeExpect == String.class)
+                {
+                    strInput = userInput.nextLine();
+                    if (strInput.length() == 0)
+                    {
+                        System.out.println("\n!!! {INPUT EMPTY} !!!");
+                        continue;
+                    }
+
+                    strInputFinal = strInput;
+                }
+
+                if(confirmInput(strInputFinal))
+                    break;
+            }
+            catch (Exception e)
+            {
+                System.out.println("\n!!! {INPUT INVALID} !!!");
+                userInput.next();
+            }
+        }
+        while(true);
+
+        return strInputFinal;
+    }
+
 
     // ========== GAMEPLAY ==========
     public static void runSession(ArrayList<PlayerCharacter> cast, String path)
     {
-        
+        // Exit and Help needs to ONLY have "exit"
+        // List has sub commands (cast, skills, inventory), REQUIRES player
+        // Roll REQUIRES a player AND their skill, reason is optional
+
+        boolean runGame = true;
+        String[] commands = new String[]{"Exit", "Help", "List", "Roll", "!c", "!i", "!s"};
+
+        String inputCommand = "";
+        while (true)
+        {
+            inputCommand = userInput.nextLine().toLowerCase();
+        }
     }
 }
