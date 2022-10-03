@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 public class PlayerCharacter
 {
     private String charName;
@@ -22,6 +25,31 @@ public class PlayerCharacter
         skillTreeRoot = root;
 
         charInv = inv;
+    }
+
+    public String getName()
+    {
+        return charName;
+    }
+
+    public long getXP()
+    {
+        return charXp;
+    }
+
+    public void alterXP(long val)
+    {
+        charXp += val;
+    }
+
+    public Skill getSkillRoot()
+    {
+        return skillTreeRoot;
+    }
+
+    public HashMap<String, Long> getInventory()
+    {
+        return charInv;
     }
 
     public void displayStats()
@@ -50,6 +78,37 @@ public class PlayerCharacter
         System.out.print("\n");
         for (int i = 0; i < header.length() - 1; i++)
             System.out.print("=");
-        System.out.println("\n");
+    }
+
+    @SuppressWarnings("unchecked")
+    public JSONObject jsonify()
+    {
+        JSONObject jRet = new JSONObject();
+
+        jRet.put("name", charName);
+        jRet.put("pronouns", charPronouns);
+        jRet.put("xp", charXp);
+
+        JSONArray jSkillTree = new JSONArray();
+        Skill.scanTree(jSkillTree, skillTreeRoot);
+        jRet.put("skills", jSkillTree);
+
+        JSONArray jInv = new JSONArray();
+        for (String key: charInv.keySet())
+        {
+            JSONObject jItem = new JSONObject();
+
+            String[] itemDescs = key.split("~");
+            long amt = charInv.get(key);
+
+            jItem.put("item", itemDescs[0]);
+            jItem.put("description", itemDescs[1]);
+            jItem.put("amount", amt);
+
+            jInv.add(jItem);
+        }
+        jRet.put("inventory", jInv);
+
+        return jRet;
     }
 }

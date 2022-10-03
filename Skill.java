@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+
 public class Skill 
 {
     private long lvl;
@@ -55,18 +58,29 @@ public class Skill
     }
 
     public Skill searchSkills(String skillName)
-    {
-        Skill retSkill = null;
-        
+    {   
         if (this.name.toLowerCase().equals(skillName.toLowerCase()))
-            retSkill = this;
+            return this;
         else
         {
-            for (Skill s : stems)
-                retSkill = s.searchSkills(skillName);
-        }
+            int resultPool = this.stems.size();
 
-        return retSkill;
+            if (resultPool > 0)
+            {
+                Skill[] results = new Skill[resultPool];
+                for (int i = 0; i < resultPool; i++)
+                    results[i] = this.stems.get(i).searchSkills(skillName);
+
+                Skill retVal = null;
+                for (int i = 0; i < resultPool; i++)
+                    if (results[i] != null)
+                        retVal = results[i];
+
+                return retVal;
+            }
+            else
+                return null;
+        }
     }
 
     public void printTree()
@@ -74,9 +88,39 @@ public class Skill
         for (int i = 0; i < lvl - 1; i++)
             System.out.print(" ");
         
-        System.out.println("> " + lvl + ": " + name);
+        System.out.println("> Lvl." + lvl + ": " + name);
 
         for (Skill s : stems)
             s.printTree();
+    }
+
+    @SuppressWarnings("unchecked")
+    public JSONObject jsonify()
+    {
+        JSONObject jRet = new JSONObject();
+
+        jRet.put("level", lvl);
+        jRet.put("skill", name);
+        
+        String prevVal;
+        if (root == null)
+            prevVal = "N/a";
+        else
+            prevVal = root.getName();
+            
+        jRet.put("previous", prevVal);
+
+        return jRet;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void scanTree(JSONArray treeStruct, Skill current)
+    {
+        JSONObject node = current.jsonify();
+
+        treeStruct.add(node);
+
+        for (Skill s : current.getStems())
+            Skill.scanTree(treeStruct, s);
     }
 }
